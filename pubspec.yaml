@@ -1,0 +1,44 @@
+name: daily_report_tv
+description: "Vizzano Daily Report TV"
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  provider: ^6.1.2
+  http: ^1.2.2
+  get_storage: ^2.1.1
+  responsive_sizer: ^3.3.1
+  calendar_date_picker2: ^1.1.7
+  flutter_local_notifications: ^18.0.1
+  timezone: ^0.10.0
+  simple_animations: ^5.1.0
+  get: ^4.6.6
+  animated_text_kit: ^4.2.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/fonts/
+
+  fonts:
+    - family: Montserrat
+      fonts:
+        - asset: assets/fonts/Montserrat-Regular.ttf
