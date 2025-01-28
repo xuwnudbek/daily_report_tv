@@ -125,9 +125,15 @@ class MainProvider extends ChangeNotifier {
     return patoks;
   }
 
-  String calcPercentage(int a, int b) {
-    double perc = ((b - a) * 100 / a);
+  double calcPercentage(int a, int b) {
+    // a = 213, b = 10
+    // 213 = 100,
+    // 10 = ?
+    if (a == 0) {
+      return 0;
+    }
+    double perc = (b * 100 / a);
 
-    return " ${perc > 0 ? "+" : ""}${perc.toStringAsFixed(1)}% ${perc > 0 ? "⬆️" : perc < 0 ? "⬇️" : ""}";
+    return perc;
   }
 }

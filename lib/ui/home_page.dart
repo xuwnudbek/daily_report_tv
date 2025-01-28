@@ -98,7 +98,7 @@ class HomePage extends StatelessWidget {
                           ),
                           defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                           columnWidths: const {
-                            0: FlexColumnWidth(3),
+                            0: FlexColumnWidth(2),
                             1: FlexColumnWidth(2),
                             2: FlexColumnWidth(2),
                             3: FlexColumnWidth(2),
@@ -111,7 +111,7 @@ class HomePage extends StatelessWidget {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     SizedBox(
-                                      height: MediaQuery.of(context).devicePixelRatio * 80,
+                                      height: MediaQuery.of(context).devicePixelRatio * 48,
                                     ),
                                     Text(
                                       'Patoklar',
@@ -185,7 +185,7 @@ class HomePage extends StatelessWidget {
                                   ),
                                   defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                                   columnWidths: const {
-                                    0: FlexColumnWidth(3),
+                                    0: FlexColumnWidth(2),
                                     1: FlexColumnWidth(2),
                                     2: FlexColumnWidth(2),
                                     3: FlexColumnWidth(2),
@@ -197,12 +197,15 @@ class HomePage extends StatelessWidget {
                                       String name = patok['patok'];
                                       int wCount = patok['workers_count'];
                                       // int tMinutes = patok['total_minutes'];
-                                      Map product = (patok['products'] as List).first ?? {};
-                                      int kutilayotgan = int.parse((product['kutilayotgan'] as double).toStringAsFixed(0));
+                                      Map product = ((patok['products'] ?? []) as List).firstOrNull ?? {};
+                                      int kutilayotgan = double.tryParse(product['kutilayotgan'].toString())?.toInt() ?? 0;
                                       int realIsh = product['real_ish'] ?? 0;
-                                      int differanceIsh = realIsh - kutilayotgan;
+                                      // int differanceIsh = realIsh - kutilayotgan;
 
                                       int index = patoks.indexOf(patok);
+
+                                      double percentage = provider.calcPercentage(kutilayotgan, realIsh);
+                                      String percentageStr = percentage.toStringAsFixed(1);
 
                                       return TableRow(
                                         decoration: BoxDecoration(
@@ -210,7 +213,7 @@ class HomePage extends StatelessWidget {
                                         ),
                                         children: [
                                           SizedBox.fromSize(
-                                            size: Size.fromHeight(MediaQuery.of(context).devicePixelRatio * 50),
+                                            size: Size.fromHeight(MediaQuery.of(context).devicePixelRatio * 48),
                                             child: Center(
                                               child: Text(
                                                 name,
@@ -246,15 +249,25 @@ class HomePage extends StatelessWidget {
                                             ),
                                           ),
                                           Center(
-                                            child: Text(
-                                              '$differanceIsh  |${provider.calcPercentage(kutilayotgan, realIsh)}',
-                                              style: TextStyle(
-                                                fontSize: 28,
-                                                color: differanceIsh > 0
-                                                    ? Colors.green
-                                                    : differanceIsh == 0
-                                                        ? Colors.black
-                                                        : Colors.red,
+                                            child: Text.rich(
+                                              TextSpan(
+                                                text: "${percentage > 0 ? "+" : ''}$percentageStr",
+                                                style: TextStyle(
+                                                  fontSize: 28,
+                                                  color: percentage > 0
+                                                      ? Colors.green
+                                                      : percentage == 0
+                                                          ? Colors.black
+                                                          : Colors.red,
+                                                ),
+                                                children: const [
+                                                  TextSpan(
+                                                    text: "%",
+                                                    style: TextStyle(
+                                                      fontSize: 20,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                           ),
@@ -270,14 +283,14 @@ class HomePage extends StatelessWidget {
                           ),
                         ),
                         // total
-                        const SizedBox(height: 16),
+                        // const SizedBox(height: 2),
                         Table(
                           border: TableBorder.all(
                             color: Colors.grey,
                           ),
                           defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                           columnWidths: const {
-                            0: FlexColumnWidth(3),
+                            0: FlexColumnWidth(2),
                             1: FlexColumnWidth(2),
                             2: FlexColumnWidth(2),
                             3: FlexColumnWidth(2),
@@ -287,15 +300,15 @@ class HomePage extends StatelessWidget {
                             List patoks = report['patoks'];
 
                             int totalWorkers = patoks.fold(0, (prev, patok) => prev + (patok['workers_count'] as int));
-                            int totalKutilayotgan = patoks.fold(
-                                0,
-                                (prev, patok) =>
-                                    prev +
-                                    int.parse(
-                                      (((patok['products'] as List).first?['kutilayotgan'] ?? 0) as double).toStringAsFixed(0),
-                                    ));
+                            int totalKutilayotgan = patoks.fold<int>(
+                              0,
+                              (prev, patok) => prev + double.parse((List.from(patok['products'] ?? []).firstOrNull?['kutilayotgan'] ?? 0).toString()).toInt(),
+                            );
                             int totalRealIsh = patoks.fold(0, (prev, patok) => prev + (patok['products'] as List).fold(0, (prev, product) => prev + (product['real_ish'] as int)));
-                            int totalDifferanceIsh = totalRealIsh - totalKutilayotgan;
+                            // int totalDifferanceIsh = totalRealIsh - totalKutilayotgan;
+
+                            double percentage = provider.calcPercentage(totalKutilayotgan, totalRealIsh);
+                            String percentageStr = percentage.toStringAsFixed(1);
 
                             return TableRow(
                               decoration: BoxDecoration(
@@ -339,15 +352,25 @@ class HomePage extends StatelessWidget {
                                   ),
                                 ),
                                 Center(
-                                  child: Text(
-                                    '$totalDifferanceIsh  |${provider.calcPercentage(totalKutilayotgan, totalRealIsh)}',
-                                    style: TextStyle(
-                                      fontSize: 28,
-                                      color: totalDifferanceIsh > 0
-                                          ? Colors.green
-                                          : totalDifferanceIsh == 0
-                                              ? Colors.black
-                                              : Colors.red,
+                                  child: Text.rich(
+                                    TextSpan(
+                                      text: "${percentage > 0 ? "+" : ''}$percentageStr",
+                                      style: TextStyle(
+                                        fontSize: 28,
+                                        color: percentage > 0
+                                            ? Colors.green
+                                            : percentage == 0
+                                                ? Colors.black
+                                                : Colors.red,
+                                      ),
+                                      children: const [
+                                        TextSpan(
+                                          text: "%",
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
